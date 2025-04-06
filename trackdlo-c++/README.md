@@ -51,22 +51,22 @@ app = trackdloApp("/path/to/config.yaml", False) # The meaning of parameters wil
 
 ### Input necessary components
 
-- `bool update_init_nodes(<init_nodes>)`: input the result from the initialization part of trackdlo, which is implemented with python.
+- `bool trackdloApp.update_init_nodes(<init_nodes>)`: input the result from the initialization part of trackdlo, which is implemented with python.
     * `init_nodes` should be a N*3 double-typed `numpy.array` containing the 3D coordinate of nodes.
     * After the nodes are successfully initialized, the variable will be locked to prevent changing. Call `reset()` to unlock.
 
-- `bool update_camera_info(<camera_proj_matrix>)`: input the transformation matrix of the camera, which is part of the `camera_info` message type in ROS package.
+- `bool trackdloApp.update_camera_info(<camera_proj_matrix>)`: input the transformation matrix of the camera, which is part of the `camera_info` message type in ROS package.
     * `camera_proj_matrix` should be a 3*4 `numpy.array`.
     * After the parameters are set, the variable will be locked to prevent changing. Call `reset()` to unlock.
 
-- `void reset()`: the function to unlock the variables to enable updating. You need to call this function everytime before updating the variables.
+- `void trackdloApp.reset()`: the function to unlock the variables to enable updating. You need to call this function everytime before updating the variables.
 
 ### Main execution and Get results
 
-- `bool execute(<rgb_image>, <depth_image>)`: the main execution function of the trackdlo tracking.
+- `bool trackdloApp.execute(<rgb_image>, <depth_image>)`: the main execution function of the trackdlo tracking.
     * `rgb_image` is a `numpy.array` from `OpenCV.Mat`. It should be a `CV_8UC3` image.
     * `depth_image` is a `numpy.array` from `OpenCV.Mat`. It should be a `CV_16UC1` image.
 
-- `numpy.array get_result_image()`: is the function to get the result after `execute` is successfully called.
+- `numpy.array trackdloApp.get_result_image()`: is the function to get the result after `execute` is successfully called.
     * There is a `numpy.array` returned by this function. Function will return None, if there is no result yet.
 
