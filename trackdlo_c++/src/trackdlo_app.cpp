@@ -1,6 +1,6 @@
 #include "trackdlo_app.h"
 
-trackdloApp::trackdloApp(const std::string& config_file_path, bool multi_color_dlo){
+trackdloApp::trackdloApp(const std::string& config_file_path){
     this->config_file_path = config_file_path;
     this->multi_color_dlo = multi_color_dlo;
 
@@ -97,6 +97,8 @@ void trackdloApp::reset(){
 
 void trackdloApp::load_config_files(){
     YAML::Node config = YAML::LoadFile(config_file_path);
+    
+    multi_color_dlo = config["multi_color_dlo"].as<bool>();
 
     upper = config["hsv_filter"]["upper"].as<std::vector<int>>();
     lower = config["hsv_filter"]["lower"].as<std::vector<int>>();
@@ -115,16 +117,38 @@ void trackdloApp::load_config_files(){
     d_vis = config["trackdlo"]["d_vis"].as<double>();
     lle_weight = config["trackdlo"]["lle_weight"].as<double>();
     downsample_leaf_size = config["trackdlo"]["downsample_leaf_size"].as<double>();
+    if (config["logging_level"]) { logging_level = config["logging_level"].as<std::string>(); }
+
+    std::transform(logging_level.begin(), logging_level.end(), logging_level.begin(), ::tolower);
+    if (logging_level == "trace") {
+        spdlog::set_level(spdlog::level::trace);
+    } else if (logging_level == "debug") {
+        spdlog::set_level(spdlog::level::debug);
+    } else if (logging_level == "info") {
+        spdlog::set_level(spdlog::level::info);
+    } else if (logging_level == "warn") {
+        spdlog::set_level(spdlog::level::warn);
+    } else if (logging_level == "error" || logging_level == "err") {
+        spdlog::set_level(spdlog::level::err);
+    } else if (logging_level == "critical") {
+        spdlog::set_level(spdlog::level::critical);
+    } else if (logging_level == "off") {
+        spdlog::set_level(spdlog::level::off);
+    } else {
+        spdlog::warn("Unknown logging level '{}', using default: info", logging_level);
+        spdlog::set_level(spdlog::level::info);
+    }
+    spdlog::info("Logging level set to '{}'", logging_level);
 }
 
 void trackdloApp::print_params(){
     std::string output_string = "\nconfig File: " + config_file_path + "\n";
-    output_string += "multi_color_dlo: " + std::to_string(multi_color_dlo) + "\n";
     output_string += "======================= Parameters =======================\n";
     output_string += "HSV Filter:\n";
     output_string += "  upper: " + std::to_string(upper[0]) + ", " + std::to_string(upper[1]) + ", " + std::to_string(upper[2]) + "\n";
     output_string += "  lower: " + std::to_string(lower[0]) + ", " + std::to_string(lower[1]) + ", " + std::to_string(lower[2]) + "\n";
     output_string += "trackdlo:\n";
+    output_string += "  multi_color_dlo:        " + std::to_string(multi_color_dlo) + "\n";
     output_string += "  visibility_threshold:   " + std::to_string(visibility_threshold) + "\n";
     output_string += "  dlo_pixel_width:        " + std::to_string(dlo_pixel_width) + "\n";
     output_string += "  beta:                   " + std::to_string(beta) + "\n";
@@ -176,7 +200,7 @@ Mat trackdloApp::color_thresholding(Mat cur_image_hsv) {
     return mask;
 }
 
-bool trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::array_t<uint8_t> depth_img_array){
+int trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::array_t<uint16_t> depth_img_array){
     // convert pybind11 data structure to cv::Mat
     pybind11::buffer_info rgb_buf = rgb_img_array.request();
     pybind11::buffer_info depth_buf = depth_img_array.request();
@@ -207,7 +231,7 @@ bool trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::ar
     
                 initialized = true;
                 spdlog::info("First time receive the init_nodes, wait for next call and start tracking.");
-                return true;
+                return 0;
             }
             spdlog::warn("Have not received init_nodes or proj_matrixs yet");
         }else{
@@ -414,6 +438,8 @@ bool trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::ar
             // minor mid-section occlusion is usually fine
             // extend visible nodes so that gaps as small as 2 to 3 nodes are filled
             std::vector<int> visible_nodes_extended = {};
+            spdlog::debug("visible_nodes.size(): " + std::to_string(visible_nodes.size()));
+            if (visible_nodes.size() <= 0) throw std::runtime_error("No visible_nodes");
             for (int i = 0; i < visible_nodes.size()-1; i ++) {
                 visible_nodes_extended.push_back(visible_nodes[i]);
                 // extend visible nodes
@@ -513,12 +539,12 @@ bool trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::ar
             if (updated_opencv_mask && simulated_occlusion) {
                 cv::putText(tracking_img, "occlusion", cv::Point(occlusion_corner_j, occlusion_corner_i-10), cv::FONT_HERSHEY_DUPLEX, 1.2, cv::Scalar(0, 0, 240), 2);
             }
-    
+
             // store the results
             result_tracking_img = tracking_img.clone();
             has_result = true;
     
-            return true;
+            return 1;
         }
     }
     catch (const std::exception& e){
@@ -529,5 +555,5 @@ bool trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::ar
         spdlog::error("Unknown exception caught!");
     }
     
-    return false;
+    return -1;
 }

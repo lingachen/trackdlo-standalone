@@ -1,6 +1,13 @@
+multi_color_dlo: false
+num_of_nodes: 30
+
+logging_level: "info"
+
 hsv_filter:
-  upper: [179, 55, 203]
-  lower: [0, 35, 130]
+  # upper: [179, 55, 203]
+  # lower: [0, 35, 130]
+  upper: [179, 255 ,30]
+  lower: [0, 0, 0]
 
 trackdlo:
   # visibility_threshold (tau_vis): the max distance a node can be away from the current point cloud to be considered visible

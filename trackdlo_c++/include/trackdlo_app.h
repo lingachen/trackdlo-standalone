@@ -2,6 +2,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 #include <yaml-cpp/yaml.h>
+#include <stdexcept>
 
 #include "trackdlo.h"
 #include "utils.h"
@@ -16,13 +17,13 @@ using Eigen::RowVectorXd;
 class trackdloApp
 {
 public:
-    trackdloApp(const std::string& config_file_path, bool multi_color_dlo);
+    trackdloApp(const std::string& config_file_path);
 
     bool update_opencv_mask(pybind11::array_t<uint8_t> mask);
     bool update_init_nodes(const MatrixXd& nodes);
     bool update_camera_info(const MatrixXd& cam_proj_matrix);
 
-    bool execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::array_t<uint8_t> depth_img_array);
+    int execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::array_t<uint16_t> depth_img_array);
     void reset();
 
     // helper functions to get results
@@ -31,9 +32,9 @@ public:
 private:
     // parameters from input
     std::string config_file_path;
-    bool multi_color_dlo;
 
     // parameters from config file
+    bool multi_color_dlo;
     double visibility_threshold;
     int dlo_pixel_width;
     double beta, beta_pre_proc;
@@ -47,6 +48,8 @@ private:
     double downsample_leaf_size;
     std::vector<int> upper;
     std::vector<int> lower;
+
+    std::string logging_level = "info";
 
     // class variables
     trackdlo tracker;
@@ -79,7 +82,7 @@ private:
 
 PYBIND11_MODULE(trackdlo_app, m) {
     pybind11::class_<trackdloApp>(m, "trackdloApp")
-        .def(pybind11::init<const std::string&, bool>())
+        .def(pybind11::init<const std::string&>())
         .def("update_camera_info", &trackdloApp::update_camera_info)
         .def("update_opencv_mask", &trackdloApp::update_opencv_mask)
         .def("update_init_nodes", &trackdloApp::update_init_nodes)

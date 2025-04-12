@@ -1,0 +1,5 @@
+numpy>=1.22
+scipy>=1.10.0
+opencv_python==4.10.0.84
+Pillow>=10.0.1
+scikit-image==0.20.0
