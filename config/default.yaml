@@ -1,7 +1,7 @@
 multi_color_dlo: false
 num_of_nodes: 30
 
-logging_level: "info"
+logging_level: "warn"
 
 hsv_filter:
   # upper: [179, 55, 203]

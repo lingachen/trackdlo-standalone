@@ -45,9 +45,8 @@ app = trackdloApp("/path/to/config.yaml", False) # The meaning of parameters wil
 
 ### constructor
 
-- `trackdloApp(<config_path>, <multi_color_dlo>)`
+- `trackdloApp(<config_path>)`
     * `config_path` is the absolute path to the config file, which is a .yaml file. Details refer to [`default.yaml`](./config/default.yaml)
-    * `multi_color_dlo` is a boolean to decide the process about hsv filtering. If `multi_color_dlo` is true, there are multiple fixed hsv filters applied to the input image. If `multi_color_dlo` is false, a hsv filter with the number in config file is applied to the input image.
 
 ### Input necessary components
 
@@ -63,9 +62,13 @@ app = trackdloApp("/path/to/config.yaml", False) # The meaning of parameters wil
 
 ### Main execution and Get results
 
-- `bool trackdloApp.execute(<rgb_image>, <depth_image>)`: the main execution function of the trackdlo tracking.
+- `int trackdloApp.execute(<rgb_image>, <depth_image>)`: the main execution function of the trackdlo tracking.
     * `rgb_image` is a `numpy.array` from `OpenCV.Mat`. It should be a `CV_8UC3` image.
     * `depth_image` is a `numpy.array` from `OpenCV.Mat`. It should be a `CV_16UC1` image.
+    * There are 3 possible output from this function:
+        + 1: The function is executed successfully and there is a result image.
+        + 0: The function is executed successfully BUT there is NO result image because of the initialization.
+        + -1: There is something error when executing the function. There is no new result image.
 
 - `numpy.array trackdloApp.get_result_image()`: is the function to get the result after `execute` is successfully called.
     * There is a `numpy.array` returned by this function. Function will return None, if there is no result yet.

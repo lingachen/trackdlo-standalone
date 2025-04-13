@@ -11,10 +11,10 @@ from scipy import interpolate
 from .utils import extract_connected_skeleton
 
 class Initializer:
-    def __init__(self, config_path):
+    def __init__(self, config_path, visualized=False):
         self.config_path = config_path
 
-        self.visualized = False
+        self.visualized = visualized
 
         # parameters
         self.num_of_nodes = None

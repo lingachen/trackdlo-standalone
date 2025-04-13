@@ -19,6 +19,7 @@ config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 15)
 config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 15)
 
 pipeline.start(config)
+print("Wait Auto-exposure become stable...")
 time.sleep(2)
 
 idx = 0

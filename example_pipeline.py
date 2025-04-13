@@ -30,6 +30,10 @@ def get_camera_proj_matrix(input_profile):
     return P
 
 
+
+
+VISUALIZED = False
+
 ctx = rs.context()
 pipeline = rs.pipeline(ctx)
 config = rs.config()
@@ -44,7 +48,7 @@ time.sleep(2)
 cam_proj_matrix = get_camera_proj_matrix(profile)
 config_path = "/home/chenla/Desktop/mount/trackdlo-standalone/config/default.yaml"
 
-initializer = Initializer(config_path=config_path)
+initializer = Initializer(config_path=config_path, visualized=VISUALIZED)
 initializer.update_cam_info(cam_proj_matrix)
 init_nodes = None
 print("Init initializer")
@@ -56,7 +60,7 @@ print("Init trackdloApp")
 
 try:
     while True:
-        time.sleep(0.2)
+        time.sleep(0.01)
 
         frames = pipeline.wait_for_frames()
 
@@ -85,9 +89,10 @@ try:
                 r = tA.update_init_nodes(init_nodes)
 
                 # Visualization
-                pcd = o3d.geometry.PointCloud()
-                pcd.points = o3d.utility.Vector3dVector(init_nodes)
-                o3d.visualization.draw_geometries([pcd])
+                if VISUALIZED:
+                    pcd = o3d.geometry.PointCloud()
+                    pcd.points = o3d.utility.Vector3dVector(init_nodes)
+                    o3d.visualization.draw_geometries([pcd])
 
                 if r:
                     has_init = True
