@@ -28,6 +28,7 @@ public:
 
     // helper functions to get results
     pybind11::object get_result_image();
+    pybind11::object get_nodes_array();
 
 private:
     // parameters from input
@@ -89,6 +90,7 @@ PYBIND11_MODULE(trackdlo_app, m) {
         .def("execute", &trackdloApp::execute)
         .def("reset", &trackdloApp::reset)
         .def("get_result_image", &trackdloApp::get_result_image)
+        .def("get_nodes_array", &trackdloApp::get_nodes_array)
         ;
 }
 

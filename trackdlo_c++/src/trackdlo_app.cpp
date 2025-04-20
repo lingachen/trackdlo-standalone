@@ -33,6 +33,14 @@ pybind11::object trackdloApp::get_result_image(){
     return output;
 }
 
+pybind11::object trackdloApp::get_nodes_array(){
+    if (!has_result){
+        return pybind11::none();
+    }
+
+    return pybind11::cast(Y);
+}
+
 bool trackdloApp::update_opencv_mask(pybind11::array_t<uint8_t> mask){
     // comment: Input must be bgr.
     if (!updated_opencv_mask){
@@ -466,7 +474,7 @@ int trackdloApp::execute(pybind11::array_t<uint8_t> rgb_img_array, pybind11::arr
             algo_total += time_diff;
             cur_time = std::chrono::high_resolution_clock::now();
     
-            // projection and pub image
+            // projection
             averaged_node_camera_dists = {};
             indices_vec = {};
             for (int i = 0; i < Y.rows()-1; i ++) {

@@ -73,3 +73,5 @@ app = trackdloApp("/path/to/config.yaml", False) # The meaning of parameters wil
 - `numpy.array trackdloApp.get_result_image()`: is the function to get the result after `execute` is successfully called.
     * There is a `numpy.array` returned by this function. Function will return None, if there is no result yet.
 
+- `numpy.array trackdloApp.get_nodes_array()`: is the function to get the result after `execute` is successfully called.
+    * There is a `numpy.array` returned by this function. Function will return None, if there is no result yet.

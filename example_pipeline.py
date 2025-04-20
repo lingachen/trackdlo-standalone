@@ -32,7 +32,7 @@ def get_camera_proj_matrix(input_profile):
 
 
 
-VISUALIZED = False
+VISUALIZED = True
 
 ctx = rs.context()
 pipeline = rs.pipeline(ctx)
@@ -102,7 +102,9 @@ try:
 
             if r>0:
                 result = tA.get_result_image()
+                nodes = tA.get_nodes_array()
                 print("Get result!")
+                print(type(nodes))
                 cv2.imshow("trackdloResult", result)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
