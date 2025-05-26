@@ -6,7 +6,7 @@ logging_level: "warn"
 hsv_filter:
   # upper: [179, 55, 203]
   # lower: [0, 35, 130]
-  upper: [179, 255 ,50]
+  upper: [179, 255 ,39]
   lower: [0, 0, 0]
 
 trackdlo:
